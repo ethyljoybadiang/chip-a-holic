@@ -418,7 +418,6 @@ async function submit(){
     : 'Screenshot this. Your Chip ID is your ticket, so bring it on the day.';
   $('#formSec').style.display = 'none';
   $('#doneSec').style.display = 'block';
-  if (demo) $('#demoNote').innerHTML = '<div class="note">PREVIEW MODE: this sign-up was not saved. Add the Google Apps Script URL to config.js to collect registrations.</div>';
   window.scrollTo({top:0,behavior:'smooth'});
 
   $('#copyBtn').onclick = async () => {

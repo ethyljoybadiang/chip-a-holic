@@ -105,6 +105,11 @@
   .note{font-family:var(--mono);font-size:12px;color:var(--gold);border:1px dashed var(--gold);padding:10px 12px;border-radius:4px;margin-top:16px}
   .presenters{font-size:14px;color:var(--muted);margin:0 0 18px}
   .presenters b{color:var(--ink);font-weight:500}
+  .promo{display:block;margin:34px 0 0;border:1px solid var(--line);border-radius:8px;overflow:hidden;text-decoration:none;color:var(--ink);background:var(--panel);transition:border-color .15s,transform .15s}
+  .promo:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .promo img{display:block;width:100%;height:auto}
+  .promo span{display:block;padding:12px 14px;font-size:14px;color:var(--muted)}
+  .promo span b{color:var(--gold);font-family:var(--mono)}
   footer{margin-top:40px;font-size:13px;color:var(--muted);text-align:center}
   footer b{color:var(--ink)}
   .spin{display:inline-block;animation:sp 1s linear infinite}
@@ -129,6 +134,10 @@
       <div class="name" id="helloName">________ and I'm a Chip-A-Holic.</div>
     </div>
     <button class="btn" id="startBtn">▶ Start the design flow</button>
+    <a class="promo" href="https://www.computer.org/membership/join" target="_blank" rel="noopener">
+      <img src="assets/cs-membership.jpg" alt="Be a member of the IEEE Computer Society. 20% off for IEEE professional members with code CSCONF27; free for IEEE student members with code CSCONF27S." loading="lazy">
+      <span>Not yet a Computer Society member? Use <b>CSCONF27</b> (20% off) or <b>CSCONF27S</b> (free for IEEE students) &rarr;</span>
+    </a>
   </section>
 
   <!-- ===== FORM ===== -->
@@ -284,6 +293,10 @@
       <button class="btn gold" id="copyBtn">Copy Chip ID</button>
       <div id="demoNote"></div>
     </div>
+    <a class="promo" href="https://www.computer.org/membership/join" target="_blank" rel="noopener">
+      <img src="assets/cs-membership.jpg" alt="Be a member of the IEEE Computer Society. 20% off for IEEE professional members with code CSCONF27; free for IEEE student members with code CSCONF27S." loading="lazy">
+      <span>Not yet a Computer Society member? Use <b>CSCONF27</b> (20% off) or <b>CSCONF27S</b> (free for IEEE students) &rarr;</span>
+    </a>
   </section>
 
   <footer>

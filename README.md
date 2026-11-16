@@ -1,7 +1,8 @@
 # Chip-A-Holic: Registration & Check-in
 
 **Chip-A-Holic: An IEEE CS TCVLSI Workshop on VLSI and Emerging Technologies**
-Dec 10–11, 2026 · IEEE Computer Society Philippines Chapter · Sponsored by the IEEE Computer Society
+Dec 10–11, 2026 · Sponsored by the IEEE Computer Society TCVLSI
+Organized by the IEEE Computer Society Philippine Chapter · Co-presented with the Technological Institute of the Philippines – Quezon City · In partnership with the IEEE TIP Student Branch
 
 | File | What it is |
 |---|---|

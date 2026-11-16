@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Chip-A-Holic · Staff Check-in</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0b1210;--panel:#111c19;--line:#1f3a32;--trace:#2fd39a;--trace-dim:#1d7a5b;--gold:#e8b44c;--ink:#e6f2ee;--muted:#8aa69c;--bad:#ff6b6b;
+        --mono:'JetBrains Mono',ui-monospace,monospace;--sans:'Space Grotesk',system-ui,sans-serif}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+  .wrap{max-width:640px;margin:0 auto;padding:18px 16px 80px}
+  .tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--trace);border:1px solid var(--trace-dim);padding:3px 8px;border-radius:2px}
+  h1{font-family:var(--mono);font-size:26px;margin:10px 0 2px}
+  h1 span{color:var(--gold)}
+  .muted{color:var(--muted);font-size:14px}
+  input,select{width:100%;background:#0a1412;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:14px;font:inherit;font-size:17px;outline:none}
+  input:focus,select:focus{border-color:var(--trace)}
+  .btn{appearance:none;border:0;cursor:pointer;font-family:var(--mono);font-weight:600;font-size:15px;padding:13px 18px;border-radius:6px;background:var(--trace);color:#03140e}
+  .btn:disabled{opacity:.5}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .btn.gold{background:var(--gold)}
+  .btn.sm{padding:8px 12px;font-size:13px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px;text-align:center}
+  .stat b{display:block;font-family:var(--mono);font-size:24px}
+  .stat span{font-size:11px;color:var(--muted);font-family:var(--mono);letter-spacing:.05em}
+  .search{position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:2}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;margin:10px 0}
+  .card.ok{border-color:var(--trace-dim);background:#0f201a}
+  .name{font-size:20px;font-weight:700}
+  .sub{color:var(--muted);font-size:14px;margin:2px 0 8px}
+  .badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .b{font-family:var(--mono);font-size:11px;padding:3px 7px;border-radius:3px;border:1px solid var(--line);color:var(--muted)}
+  .b.full{color:var(--gold);border-color:var(--gold)}
+  .b.online{color:#7fb7ff;border-color:#7fb7ff}
+  .b.warn{color:var(--bad);border-color:var(--bad)}
+  .b.green{color:var(--trace);border-color:var(--trace)}
+  .actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .chk{display:flex;align-items:center;gap:8px;font-size:15px;cursor:pointer;flex:1;min-width:180px}
+  .chk input{width:22px;height:22px;accent-color:var(--trace)}
+  .done{font-family:var(--mono);color:var(--trace);font-size:14px;flex:1}
+  .empty{text-align:center;color:var(--muted);padding:30px 0;font-size:15px}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:5}
+  .modal.on{display:flex}
+  .sheet{background:var(--panel);border-top:2px solid var(--gold);width:100%;max-width:640px;padding:20px 16px 28px;border-radius:12px 12px 0 0;max-height:92vh;overflow:auto}
+  .sheet label{display:block;margin-bottom:12px;font-size:14px}
+  .sheet label > input,.sheet label > select{margin-top:5px}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#03140e;font-family:var(--mono);font-size:14px;padding:12px 18px;border-radius:6px;display:none;z-index:9;max-width:90%}
+  .demo{font-family:var(--mono);font-size:12px;color:var(--gold);border:1px dashed var(--gold);padding:8px 10px;border-radius:4px;margin:10px 0}
+  #gate{max-width:380px;margin:60px auto 0}
+  #gate input{margin:8px 0}
+  .err{color:var(--bad);font-family:var(--mono);font-size:13px;min-height:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- PIN GATE -->
+  <section id="gate">
+    <span class="tag">STAFF ONLY</span>
+    <h1>Chip<span>-A-</span>Holic check-in</h1>
+    <p class="muted">Enter your name and the staff PIN.</p>
+    <input id="staffName" placeholder="Your name (e.g. Joy)" autocomplete="name">
+    <input id="pinIn" type="password" placeholder="Staff PIN" inputmode="text">
+    <div class="err" id="gateErr"></div>
+    <button class="btn" id="enterBtn" style="width:100%">Enter</button>
+  </section>
+
+  <!-- MAIN -->
+  <section id="main" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><span class="tag">CHECK-IN DESK</span><h1 style="font-size:22px">Chip<span>-A-</span>Holic</h1></div>
+      <button class="btn ghost sm" id="logoutBtn">Lock</button>
+    </div>
+    <div id="demoNote"></div>
+    <div class="stats">
+      <div class="stat"><b id="sIn">–</b><span>CHECKED IN</span></div>
+      <div class="stat"><b id="sOnsite">–</b><span>ONSITE REG.</span></div>
+      <div class="stat"><b id="sRel">–</b><span>RELEASE FORMS</span></div>
+    </div>
+    <div class="search">
+      <input id="q" placeholder="Search name, Chip ID, email or school…" autocomplete="off">
+    </div>
+    <div id="results"><div class="empty">Type at least 2 letters of the participant's name.</div></div>
+    <button class="btn gold" id="walkBtn" style="width:100%;margin-top:14px">+ Add walk-in</button>
+  </section>
+</div>
+
+<!-- WALK-IN -->
+<div class="modal" id="walkModal">
+  <div class="sheet">
+    <h3 style="margin:0 0 4px">Walk-in registration</h3>
+    <p class="muted" style="margin:0 0 14px">For people who didn't register online.</p>
+    <label>Full name<input id="wName"></label>
+    <label>Email<input id="wEmail" type="email"></label>
+    <label>Mobile<input id="wMobile" type="tel"></label>
+    <label>School / Organization<input id="wOrg"></label>
+    <label>Package
+      <select id="wTrack">
+        <option>Talks only (Onsite)</option>
+        <option>Hands-on Workshop + Talks (Onsite)</option>
+      </select></label>
+    <label class="chk"><input type="checkbox" id="wConsent"> They agreed to the data privacy notice</label>
+    <label class="chk"><input type="checkbox" id="wRelease"> IEEE Release Form signed</label>
+    <div class="err" id="wErr"></div>
+    <div class="actions" style="margin-top:8px">
+      <button class="btn ghost" id="wCancel">Cancel</button>
+      <button class="btn" id="wSave" style="flex:1">Add & check in</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script>
+const CONFIG = window.CONFIG || { ENDPOINT: '' };
+const DEMO = !CONFIG.ENDPOINT;
+const $ = s => document.querySelector(s);
+let PIN = '', BY = '';
+
+/* ---------- demo data (only used when ENDPOINT is empty) ---------- */
+const demoRows = [
+  {chipId:'CAH-7KQ2M',name:'Juan Dela Cruz',org:'Sample University',track:'Hands-on Workshop + Talks (Onsite)',laptop:"No, I'll need one",checkedInAt:'',releaseSigned:'',checkedInBy:''},
+  {chipId:'CAH-X9P4R',name:'Maria Santos',org:'Sample Institute of Technology',track:'Talks only (Onsite)',laptop:'',checkedInAt:'',releaseSigned:'',checkedInBy:''},
+  {chipId:'CAH-3HD8T',name:'Jose Reyes',org:'Sample Company',track:'Talks only (Online)',laptop:'',checkedInAt:'',releaseSigned:'',checkedInBy:''},
+  {chipId:'CAH-L2W6N',name:'Ana Mendoza',org:'Sample University',track:'Hands-on Workshop + Talks (Onsite)',laptop:'Yes, bringing my own laptop',checkedInAt:'',releaseSigned:'',checkedInBy:''}
+];
+function demoApi(b){
+  const r = demoRows;
+  if (b.action==='stats') return {ok:true,onsite:r.filter(x=>x.track.includes('Onsite')).length,checkedIn:r.filter(x=>x.checkedInAt).length,releaseSigned:r.filter(x=>x.releaseSigned==='Yes').length};
+  if (b.action==='search'){const q=b.q.toLowerCase();return {ok:true,results:r.filter(x=>[x.name,x.chipId,x.org].some(v=>v.toLowerCase().includes(q)))};}
+  if (b.action==='checkin'){const x=r.find(y=>y.chipId===b.chipId);
+    if(b.undo){x.checkedInAt='';x.releaseSigned='';x.checkedInBy='';} else if(x.checkedInAt) return {ok:true,already:true,record:x};
+    else {x.checkedInAt=new Date().toISOString();x.releaseSigned=b.release?'Yes':'No';x.checkedInBy=b.by;}
+    return {ok:true,record:x};}
+  if (b.action==='walkin'){const id='WALK-'+Math.random().toString(36).slice(2,7).toUpperCase();
+    r.push({chipId:id,name:b.name,org:b.org,track:b.track,laptop:'',checkedInAt:new Date().toISOString(),releaseSigned:b.release?'Yes':'No',checkedInBy:b.by});return {ok:true,chipId:id};}
+}
+
+async function api(body){
+  body = {...body, pin: PIN, by: BY};
+  if (DEMO) { await new Promise(r=>setTimeout(r,250)); return demoApi(body); }
+  const res = await fetch(CONFIG.ENDPOINT, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(body)});
+  return res.json();
+}
+
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',2600); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function hhmm(iso){ try{ return new Date(iso).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}); }catch{ return ''; } }
+
+/* ---------- gate ---------- */
+try { PIN = sessionStorage.getItem('cah_pin')||''; BY = sessionStorage.getItem('cah_by')||''; } catch {}
+async function enter(){
+  const err=$('#gateErr'); err.textContent='';
+  BY = $('#staffName').value.trim() || BY; PIN = $('#pinIn').value.trim() || PIN;
+  if (!BY) { err.textContent='> Please enter your name.'; return; }
+  if (!DEMO && !PIN) { err.textContent='> Please enter the staff PIN.'; return; }
+  $('#enterBtn').disabled = true;
+  try {
+    const s = await api({action:'stats'});
+    if (!s.ok) throw new Error(s.error || 'Error');
+    try { sessionStorage.setItem('cah_pin',PIN); sessionStorage.setItem('cah_by',BY); } catch {}
+    $('#gate').style.display='none'; $('#main').style.display='block';
+    if (DEMO) $('#demoNote').innerHTML='<div class="demo">PREVIEW MODE: sample data only. Add the Apps Script URL to config.js to go live.</div>';
+    showStats(s); $('#q').focus();
+  } catch(e) { err.textContent = '> ' + (e.message === 'Wrong PIN' ? 'Wrong PIN.' : 'Could not connect. Check the internet and try again.'); }
+  $('#enterBtn').disabled = false;
+}
+$('#enterBtn').onclick = enter;
+$('#pinIn').addEventListener('keydown', e => { if (e.key==='Enter') enter(); });
+if (BY && (PIN || DEMO)) { $('#staffName').value = BY; enter(); }
+$('#logoutBtn').onclick = () => { try{sessionStorage.clear();}catch{} location.reload(); };
+
+/* ---------- stats ---------- */
+function showStats(s){ $('#sIn').textContent=s.checkedIn; $('#sOnsite').textContent=s.onsite; $('#sRel').textContent=s.releaseSigned; }
+async function refreshStats(){ try{ const s=await api({action:'stats'}); if(s.ok) showStats(s);}catch{} }
+setInterval(() => { if ($('#main').style.display==='block') refreshStats(); }, 30000);
+
+/* ---------- search ---------- */
+let qTimer, lastQ = '';
+$('#q').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => search(e.target.value), 350); });
+async function search(q){
+  q = q.trim(); lastQ = q;
+  const box = $('#results');
+  if (q.length < 2) { box.innerHTML = '<div class="empty">Type at least 2 letters of the participant\'s name.</div>'; return; }
+  box.innerHTML = '<div class="empty">Searching…</div>';
+  try {
+    const r = await api({action:'search', q});
+    if (q !== lastQ) return;
+    if (!r.ok) throw new Error(r.error);
+    if (!r.results.length) { box.innerHTML = '<div class="empty">No match for “'+esc(q)+'”.<br>Try a surname or school, or add them as a walk-in.</div>'; return; }
+    box.innerHTML = r.results.map(card).join('');
+  } catch { box.innerHTML = '<div class="empty">Connection problem. Try again.</div>'; }
+}
+
+function card(p){
+  const full = String(p.track).startsWith('Hands-on'), online = String(p.track).includes('Online');
+  const badges = [
+    `<span class="b">${esc(p.chipId)}</span>`,
+    full ? '<span class="b full">HANDS-ON WORKSHOP</span>' : online ? '<span class="b online">ONLINE · not expected onsite</span>' : '<span class="b">TALKS ONLY</span>',
+    String(p.laptop).startsWith('No') ? '<span class="b warn">NEEDS A LAPTOP</span>' : ''
+  ].join('');
+  const done = !!p.checkedInAt;
+  const act = done
+    ? `<div class="done">✓ In at ${hhmm(p.checkedInAt)}${p.checkedInBy ? ' · '+esc(p.checkedInBy) : ''}<br>
+         <span style="color:${p.releaseSigned==='Yes'?'var(--trace)':'var(--bad)'}">Release form: ${p.releaseSigned==='Yes'?'signed':'NOT signed'}</span></div>
+       <button class="btn ghost sm" data-undo="${esc(p.chipId)}">Undo</button>`
+    : `<label class="chk"><input type="checkbox" id="rel-${esc(p.chipId)}"> Release form signed</label>
+       <button class="btn" data-in="${esc(p.chipId)}">Check in</button>`;
+  return `<div class="card ${done?'ok':''}" id="c-${esc(p.chipId)}">
+    <div class="name">${esc(p.name)}</div><div class="sub">${esc(p.org)}</div>
+    <div class="badges">${badges}</div><div class="actions">${act}</div></div>`;
+}
+
+$('#results').addEventListener('click', async e => {
+  const inId = e.target.dataset.in, undoId = e.target.dataset.undo;
+  if (!inId && !undoId) return;
+  const id = inId || undoId;
+  const body = {action:'checkin', chipId:id};
+  if (undoId) body.undo = true;
+  else {
+    body.release = document.getElementById('rel-'+id).checked;
+    if (!body.release) toast('Heads up: release form not ticked. Have them sign it.');
+  }
+  e.target.disabled = true;
+  try {
+    const r = await api(body);
+    if (!r.ok) throw new Error(r.error);
+    document.getElementById('c-'+id).outerHTML = card(r.record);
+    if (r.already) toast(r.record.name + ' was already checked in.');
+    else if (!undoId && body.release) toast('✓ ' + r.record.name + ' checked in');
+    refreshStats();
+  } catch { e.target.disabled = false; toast('Could not save. Try again.'); }
+});
+
+/* ---------- walk-in ---------- */
+const wm = $('#walkModal');
+$('#walkBtn').onclick = () => { wm.classList.add('on'); $('#wName').focus(); };
+$('#wCancel').onclick = () => wm.classList.remove('on');
+$('#wSave').onclick = async () => {
+  const err = $('#wErr'); err.textContent = '';
+  const b = {action:'walkin', name:$('#wName').value.trim(), email:$('#wEmail').value.trim(), mobile:$('#wMobile').value.trim(),
+             org:$('#wOrg').value.trim(), track:$('#wTrack').value, release:$('#wRelease').checked};
+  if (!b.name) { err.textContent='> Name is required.'; return; }
+  if (!$('#wConsent').checked) { err.textContent='> Please get their data privacy consent first.'; return; }
+  $('#wSave').disabled = true;
+  try {
+    const r = await api(b);
+    if (!r.ok) throw new Error(r.error);
+    wm.classList.remove('on');
+    ['#wName','#wEmail','#wMobile','#wOrg'].forEach(s=>$(s).value=''); $('#wConsent').checked=false; $('#wRelease').checked=false;
+    toast('✓ Walk-in added: ' + r.chipId);
+    $('#q').value = b.name; search(b.name); refreshStats();
+  } catch { err.textContent = '> Could not save. Try again.'; }
+  $('#wSave').disabled = false;
+};
+</script>
+</body>
+</html>

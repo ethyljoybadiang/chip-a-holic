@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chip-A-Holic Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* Settings live in config.js */
+  :root{
+    --bg:#0b1210; --panel:#111c19; --line:#1f3a32; --trace:#2fd39a; --trace-dim:#1d7a5b;
+    --gold:#e8b44c; --ink:#e6f2ee; --muted:#8aa69c; --bad:#ff6b6b;
+    --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Space Grotesk',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5}
+  body{
+    min-height:100vh;
+    background-image:
+      linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:32px 32px;background-position:-1px -1px;
+  }
+  body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at 50% 0%,transparent 0%,var(--bg) 75%);pointer-events:none}
+  .wrap{position:relative;max-width:760px;margin:0 auto;padding:32px 20px 64px}
+  .mono{font-family:var(--mono)}
+  .tag{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--trace);border:1px solid var(--trace-dim);padding:4px 10px;border-radius:2px}
+  h1{font-family:var(--mono);font-weight:800;font-size:clamp(40px,9vw,76px);line-height:1;margin:18px 0 8px;letter-spacing:-.03em}
+  h1 .dash{color:var(--gold)}
+  .sub{font-size:clamp(18px,3.4vw,22px);color:var(--muted);margin:0 0 6px}
+  .sub b{color:var(--ink);font-weight:500}
+  .meta{display:flex;flex-wrap:wrap;gap:10px 22px;margin:22px 0 28px;font-family:var(--mono);font-size:14px}
+  .meta span{color:var(--muted)} .meta strong{color:var(--ink);font-weight:600}
+  .hello{border:2px solid var(--bad);border-radius:10px;overflow:hidden;max-width:420px;margin:26px 0;background:#fff;color:#111;box-shadow:0 10px 40px rgba(0,0,0,.4);transform:rotate(-1.5deg)}
+  .hello .top{background:var(--bad);color:#fff;text-align:center;padding:8px 0 6px}
+  .hello .top b{display:block;font-size:26px;letter-spacing:.06em}
+  .hello .top small{font-size:13px}
+  .hello .name{padding:18px;text-align:center;font-family:var(--mono);font-size:22px;font-weight:600}
+  .btn{appearance:none;border:0;cursor:pointer;font-family:var(--mono);font-weight:600;font-size:15px;padding:14px 22px;border-radius:4px;background:var(--trace);color:#03140e;transition:transform .12s,box-shadow .12s;box-shadow:0 0 0 0 rgba(47,211,154,.5)}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 0 24px 2px rgba(47,211,154,.35)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+  .btn.gold{background:var(--gold)}
+  /* pipeline */
+  .flow{display:flex;gap:0;margin:8px 0 22px;font-family:var(--mono);font-size:11px;letter-spacing:.06em}
+  .flow div{flex:1;text-align:center;padding:8px 2px;border-top:3px solid var(--line);color:var(--muted);transition:.25s}
+  .flow div.done{border-color:var(--trace-dim);color:var(--trace-dim)}
+  .flow div.on{border-color:var(--trace);color:var(--trace)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:26px;position:relative}
+  .panel::before,.panel::after{content:"";position:absolute;width:10px;height:10px;border:2px solid var(--gold)}
+  .panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+  .step{display:none;animation:in .3s ease}
+  .step.on{display:block}
+  @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .step h2{font-family:var(--mono);font-size:13px;letter-spacing:.1em;color:var(--trace);margin:0 0 4px;font-weight:600}
+  .step h3{font-size:24px;margin:0 0 4px;font-weight:700}
+  .step p.hint{margin:0 0 20px;color:var(--muted)}
+  label.f{display:block;margin:0 0 16px}
+  label.f > span{display:block;font-size:14px;margin-bottom:6px;color:var(--ink)}
+  label.f > span em{color:var(--muted);font-style:normal;font-size:12px;font-family:var(--mono)}
+  input[type=text],input[type=email],input[type=tel],select,textarea{
+    width:100%;background:#0a1412;border:1px solid var(--line);color:var(--ink);border-radius:4px;padding:12px 14px;font:inherit;font-size:16px;outline:none;transition:border-color .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--trace)}
+  .err{color:var(--bad);font-size:13px;font-family:var(--mono);min-height:18px;margin-top:-8px;margin-bottom:8px}
+  .nodes{display:grid;gap:10px}
+  .node{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:4px;padding:12px 14px;cursor:pointer;transition:.15s}
+  .node:hover{border-color:var(--trace-dim)}
+  .node input{accent-color:var(--trace);width:18px;height:18px}
+  .node b{font-family:var(--mono);color:var(--gold);min-width:58px}
+  .node.sel{border-color:var(--trace);background:rgba(47,211,154,.06)}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.row{grid-template-columns:1fr}.flow{font-size:9px}}
+  .nav{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+  .gate{display:flex;align-items:center;justify-content:center;margin:6px 0 18px}
+  .answers{display:flex;gap:12px;justify-content:center}
+  .answers .btn{min-width:80px;font-size:22px}
+  .verdict{text-align:center;font-family:var(--mono);margin-top:14px;min-height:24px}
+  .check{display:flex;gap:12px;align-items:flex-start;margin:0 0 14px;font-size:15px;cursor:pointer}
+  .check input{accent-color:var(--trace);width:18px;height:18px;margin-top:3px;flex:none}
+  .check small{color:var(--muted)}
+  /* ticket */
+  .die{margin:8px auto 0;max-width:460px;aspect-ratio:1/1;position:relative;background:#141a17;border:2px solid var(--gold);border-radius:6px;padding:12%;}
+  .pins{position:absolute;display:flex;justify-content:space-around}
+  .pins i{display:block;background:var(--gold);opacity:.85}
+  .pins.t,.pins.b{left:10%;right:10%;height:8%}
+  .pins.t{top:-8%} .pins.b{bottom:-8%}
+  .pins.t i,.pins.b i{width:3%;height:100%}
+  .pins.l,.pins.r{top:10%;bottom:10%;width:8%;flex-direction:column}
+  .pins.l{left:-8%} .pins.r{right:-8%}
+  .pins.l i,.pins.r i{height:3%;width:100%}
+  .core{height:100%;border:1px dashed var(--trace-dim);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:6%;background:repeating-linear-gradient(45deg,rgba(47,211,154,.04) 0 6px,transparent 6px 12px)}
+  .core .k{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em}
+  .core .v{font-family:var(--mono);font-weight:800;font-size:clamp(18px,4.6vw,26px);margin-bottom:10px;word-break:break-word}
+  .core .id{color:var(--gold)}
+  .dot{position:absolute;top:16%;left:16%;width:12px;height:12px;border-radius:50%;background:var(--gold)}
+  .done-msg{text-align:center;margin-top:44px}
+  .done-msg p{color:var(--muted)}
+  .note{font-family:var(--mono);font-size:12px;color:var(--gold);border:1px dashed var(--gold);padding:10px 12px;border-radius:4px;margin-top:16px}
+  footer{margin-top:40px;font-size:13px;color:var(--muted);text-align:center}
+  footer b{color:var(--ink)}
+  .spin{display:inline-block;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== HERO ===== -->
+  <section id="hero">
+    <span class="tag">IEEE CS TCVLSI WORKSHOP · PHILIPPINES</span>
+    <h1>Chip<span class="dash">-A-</span>Holic</h1>
+    <p class="sub">A workshop on <b>VLSI and Emerging Technologies</b>.<br>Step 1 of recovery: admit you can't stop thinking about transistors.</p>
+    <div class="meta">
+      <div><span>DATES//</span> <strong>Dec 10–11, 2026</strong></div>
+      <div><span>FAB//</span> <strong id="venueTxt">Venue TBA</strong></div>
+      <div><span>WAFER COUNT//</span> <strong id="seatsTxt">Limited slots</strong></div>
+    </div>
+    <div class="hello" aria-hidden="true">
+      <div class="top"><b>HELLO</b><small>my name is</small></div>
+      <div class="name" id="helloName">________ and I'm a Chip-A-Holic.</div>
+    </div>
+    <button class="btn" id="startBtn">▶ Start the design flow</button>
+  </section>
+
+  <!-- ===== FORM ===== -->
+  <section id="formSec" style="display:none">
+    <div class="flow" id="flow">
+      <div>SPEC</div><div>RTL</div><div>SYNTH</div><div>TIMING</div><div>SIGN-OFF</div>
+    </div>
+
+    <form class="panel" id="reg" novalidate>
+      <!-- 1 SPEC -->
+      <div class="step on" data-step="0">
+        <h2>01 // SPECIFICATION</h2>
+        <h3>Who's the lead designer?</h3>
+        <p class="hint">Every great chip starts with a clear spec. So does every great participant.</p>
+        <label class="f"><span>Full name <em>// as it should appear on your certificate</em></span>
+          <input type="text" name="name" id="name" autocomplete="name" required></label>
+        <label class="f"><span>Email <em>// where we send the tape-out confirmation</em></span>
+          <input type="email" name="email" autocomplete="email" required></label>
+        <label class="f"><span>Mobile number</span>
+          <input type="tel" name="mobile" autocomplete="tel" placeholder="09XX XXX XXXX" required></label>
+        <div class="err"></div>
+      </div>
+
+      <!-- 2 RTL -->
+      <div class="step" data-step="1">
+        <h2>02 // REGISTER-TRANSFER LEVEL</h2>
+        <h3>Where were you fabricated?</h3>
+        <p class="hint">Your school, company or org. We don't judge foundries.</p>
+        <label class="f"><span>School / Organization</span>
+          <input type="text" name="org" required></label>
+        <div class="row">
+          <label class="f"><span>You are a…</span>
+            <select name="role" required>
+              <option value="">— select —</option>
+              <option>Undergraduate student</option>
+              <option>Graduate student</option>
+              <option>Faculty / Researcher</option>
+              <option>Industry professional</option>
+              <option>Other</option>
+            </select></label>
+          <label class="f"><span>Course & year <em>// or job title</em></span>
+            <input type="text" name="program" placeholder="e.g. BS CpE, 3rd year" required></label>
+        </div>
+        <label class="f"><span>IEEE member?</span>
+          <select name="ieee" required>
+            <option value="">— select —</option>
+            <option>Yes, IEEE member</option>
+            <option>Yes, IEEE Computer Society member</option>
+            <option>Not yet</option>
+          </select></label>
+        <div class="err"></div>
+      </div>
+
+      <!-- 3 SYNTH -->
+      <div class="step" data-step="2">
+        <h2>03 // SYNTHESIS</h2>
+        <h3>Pick your package.</h3>
+        <p class="hint">How are you joining Chip-A-Holic?</p>
+        <div class="nodes" id="tracks">
+          <label class="node"><input type="radio" name="track" value="Hands-on Workshop + Talks (Onsite)"><b>FULL</b><span><strong>Full Tape-out</strong>: hands-on workshop + talks. <em class="mono" style="color:var(--gold);font-style:normal;font-size:12px">ONSITE ONLY, hardware kits are in the fab</em></span></label>
+          <label class="node"><input type="radio" name="track" value="Talks only (Onsite)"><b>FAB</b><span><strong>Fab Visitor</strong>: talks only, joining in person</span></label>
+          <label class="node"><input type="radio" name="track" value="Talks only (Online)"><b>PROBE</b><span><strong>Remote Probe</strong>: talks only, joining online</span></label>
+        </div>
+        <h3 style="margin-top:26px">What's your current process node?</h3>
+        <p class="hint">Smaller is more advanced. No shame in 180nm, it still ships billions of chips.</p>
+        <div class="nodes" id="nodes">
+          <label class="node"><input type="radio" name="level" value="180nm - What's a transistor?"><b>180nm</b><span>What's a transistor? (I'm here to find out)</span></label>
+          <label class="node"><input type="radio" name="level" value="65nm - I know my logic gates"><b>65nm</b><span>I know my logic gates and Karnaugh maps</span></label>
+          <label class="node"><input type="radio" name="level" value="7nm - I've written Verilog/VHDL"><b>7nm</b><span>I've written Verilog/VHDL and survived the testbench</span></label>
+          <label class="node"><input type="radio" name="level" value="2nm - I dream in GDSII"><b>2nm</b><span>I dream in GDSII and argue about slack</span></label>
+        </div>
+        <label class="f" style="margin-top:18px" id="laptopF"><span>Will you bring a laptop?</span>
+          <select name="laptop" required>
+            <option value="">— select —</option>
+            <option>Yes, bringing my own laptop</option>
+            <option>No, I'll need one</option>
+          </select></label>
+        <label class="f" id="dietF"><span>Dietary needs <em>// optional, for snacks</em></span>
+          <input type="text" name="diet" placeholder="e.g. vegetarian, no pork"></label>
+        <div class="err"></div>
+      </div>
+
+      <!-- 4 TIMING -->
+      <div class="step" data-step="3">
+        <h2>04 // STATIC TIMING ANALYSIS</h2>
+        <h3>Prove you're not a bot.</h3>
+        <p class="hint">Easy one. What does this gate output?</p>
+        <div class="gate">
+          <svg viewBox="0 0 320 130" width="320" height="130" role="img" aria-label="NAND gate with inputs A equals 1 and B equals 1">
+            <g font-family="JetBrains Mono" font-size="16" fill="#e6f2ee">
+              <text x="6" y="44">A=1</text><text x="6" y="98">B=1</text>
+            </g>
+            <g stroke="#2fd39a" stroke-width="3" fill="none">
+              <line x1="52" y1="39" x2="110" y2="39"/><line x1="52" y1="93" x2="110" y2="93"/>
+              <path d="M110 18 H160 A48 48 0 0 1 160 114 H110 Z" fill="#111c19"/>
+              <circle cx="216" cy="66" r="7" fill="#111c19"/>
+              <line x1="223" y1="66" x2="270" y2="66"/>
+            </g>
+            <text x="135" y="72" font-family="JetBrains Mono" font-size="13" fill="#8aa69c">NAND</text>
+            <text x="278" y="72" font-family="JetBrains Mono" font-size="22" font-weight="800" fill="#e8b44c">?</text>
+          </svg>
+        </div>
+        <div class="answers">
+          <button type="button" class="btn ghost" data-ans="0">0</button>
+          <button type="button" class="btn ghost" data-ans="1">1</button>
+        </div>
+        <div class="verdict" id="verdict"></div>
+        <div class="err"></div>
+      </div>
+
+      <!-- 5 SIGN-OFF -->
+      <div class="step" data-step="4">
+        <h2>05 // SIGN-OFF</h2>
+        <h3>Final checks before tape-out.</h3>
+        <p class="hint">The fab won't run without these.</p>
+        <label class="check"><input type="checkbox" name="privacy" required>
+          <span>I consent to the IEEE CS Philippines Chapter collecting and processing my information for this workshop, in line with the Data Privacy Act of 2012 (RA 10173). <small>We use it only for registration, certificates and event updates.</small></span></label>
+        <label class="check"><input type="checkbox" name="release" required>
+          <span>I understand that I need to sign the <b>IEEE Release Form</b> before joining the workshop. <small>Photos and videos may be taken during the event.</small></span></label>
+        <div class="err"></div>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="btn ghost" id="backBtn">← Back</button>
+        <button type="button" class="btn" id="nextBtn">Next stage →</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===== TICKET ===== -->
+  <section id="doneSec" style="display:none">
+    <div class="done-msg" style="margin-top:0;margin-bottom:40px">
+      <span class="tag">TAPE-OUT SUCCESSFUL</span>
+      <h3 style="font-size:28px;margin:14px 0 6px">Your chip is in the fab. 🎉</h3>
+      <p>Welcome to the club. You're officially a Chip-A-Holic.</p>
+    </div>
+    <div class="die">
+      <div class="pins t"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="pins b"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="pins l"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="pins r"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="dot"></div>
+      <div class="core">
+        <div class="k">DESIGNER</div><div class="v" id="tName">—</div>
+        <div class="k">CHIP ID</div><div class="v id" id="tId">—</div>
+        <div class="k">PACKAGE</div><div class="v" id="tTrack" style="font-size:15px">—</div>
+        <div class="k">PROCESS NODE</div><div class="v" id="tNode" style="font-size:16px">—</div>
+        <div class="k">FAB DATE</div><div class="v" style="font-size:16px;margin:0">DEC 10–11, 2026</div>
+      </div>
+    </div>
+    <div class="done-msg">
+      <p id="nextInfo">Screenshot this. Your Chip ID is your ticket, so bring it on the day.</p>
+      <button class="btn gold" id="copyBtn">Copy Chip ID</button>
+      <div id="demoNote"></div>
+    </div>
+  </section>
+
+  <footer>
+    <b>Chip-A-Holic: An IEEE CS TCVLSI Workshop on VLSI and Emerging Technologies</b><br>
+    Sponsored by the IEEE Computer Society Technical Community on VLSI.<br>
+    Organized by the IEEE Computer Society Philippines Chapter.<br>
+    <span id="contactTxt"></span>
+  </footer>
+</div>
+
+<script src="config.js"></script>
+<script>
+const CONFIG = window.CONFIG || { ENDPOINT:'', VENUE:'Venue TBA', SEATS:'Limited slots', CONTACT:'' };
+
+document.getElementById('venueTxt').textContent = CONFIG.VENUE;
+document.getElementById('seatsTxt').textContent = CONFIG.SEATS;
+document.getElementById('contactTxt').textContent = CONFIG.CONTACT;
+
+const $ = s => document.querySelector(s);
+const steps = [...document.querySelectorAll('.step')];
+const flow = [...document.querySelectorAll('#flow div')];
+const form = $('#reg');
+let cur = 0, gatePassed = false;
+
+$('#startBtn').onclick = () => {
+  $('#hero').style.display = 'none';
+  $('#formSec').style.display = 'block';
+  render(); window.scrollTo({top:0,behavior:'smooth'});
+};
+
+$('#name').addEventListener('input', e => {
+  const v = e.target.value.trim();
+  $('#helloName').textContent = (v || '________') + " and I'm a Chip-A-Holic.";
+});
+
+document.querySelectorAll('.node input').forEach(r => r.addEventListener('change', () => {
+  document.querySelectorAll('.node').forEach(n => n.classList.toggle('sel', n.querySelector('input').checked));
+  applyTrack();
+}));
+
+// Laptop question only for hands-on; dietary only for onsite.
+function applyTrack(){
+  const t = (form.querySelector('input[name=track]:checked') || {}).value || '';
+  const handsOn = t.startsWith('Hands-on'), onsite = t.includes('Onsite');
+  const lf = $('#laptopF'), sel = lf.querySelector('select');
+  lf.style.display = handsOn ? '' : 'none';
+  sel.required = handsOn; if (!handsOn) sel.value = '';
+  $('#dietF').style.display = onsite ? '' : 'none';
+  if (!onsite) $('#dietF').querySelector('input').value = '';
+}
+applyTrack();
+
+document.querySelectorAll('[data-ans]').forEach(b => b.onclick = () => {
+  const v = $('#verdict');
+  if (b.dataset.ans === '0') {
+    gatePassed = true;
+    v.innerHTML = '<span style="color:var(--trace)">✓ Timing met. Slack: positive. You may proceed.</span>';
+    setTimeout(() => go(1), 900);
+  } else {
+    gatePassed = false;
+    v.innerHTML = '<span style="color:var(--bad)">✗ Setup violation! Hint: it\'s an AND… with a twist.</span>';
+  }
+});
+
+function render(){
+  steps.forEach((s,i) => s.classList.toggle('on', i === cur));
+  flow.forEach((f,i) => { f.classList.toggle('on', i === cur); f.classList.toggle('done', i < cur); });
+  $('#backBtn').style.visibility = cur === 0 ? 'hidden' : 'visible';
+  const last = cur === steps.length - 1;
+  $('#nextBtn').textContent = last ? 'TAPE OUT 🚀' : 'Next stage →';
+  $('#nextBtn').classList.toggle('gold', last);
+  $('#nextBtn').style.display = cur === 3 ? 'none' : '';
+}
+
+function validate(i){
+  const s = steps[i], err = s.querySelector('.err');
+  err.textContent = '';
+  for (const el of s.querySelectorAll('[required]')) {
+    if (el.type === 'checkbox' && !el.checked) { err.textContent = '> DRC error: please tick every box to sign off.'; return false; }
+    if (!el.value.trim()) { el.focus(); err.textContent = '> Lint error: missing a required field.'; return false; }
+    if (el.type === 'email' && !/^\S+@\S+\.\S+$/.test(el.value)) { el.focus(); err.textContent = '> Syntax error: that email won\'t compile.'; return false; }
+  }
+  if (i === 2 && !form.querySelector('input[name=track]:checked')) { err.textContent = '> Choose a package first: Full Tape-out, Fab Visitor or Remote Probe.'; return false; }
+  if (i === 2 && !form.querySelector('input[name=level]:checked')) { err.textContent = '> Pick a process node. Any node. We\'re not picky.'; return false; }
+  if (i === 3 && !gatePassed) { err.textContent = '> Timing not closed yet.'; return false; }
+  return true;
+}
+
+function go(d){
+  if (d > 0 && !validate(cur)) return;
+  if (d > 0 && cur === steps.length - 1) return submit();
+  cur = Math.max(0, Math.min(steps.length - 1, cur + d));
+  render();
+}
+$('#nextBtn').onclick = () => go(1);
+$('#backBtn').onclick = () => go(-1);
+form.addEventListener('submit', e => { e.preventDefault(); go(1); });
+
+function chipId(){
+  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = ''; const a = new Uint32Array(5); crypto.getRandomValues(a);
+  a.forEach(n => s += c[n % c.length]);
+  return 'CAH-' + s;
+}
+
+async function submit(){
+  const btn = $('#nextBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin">⚙</span> Fabricating…';
+  const fd = new FormData(form);
+  const data = Object.fromEntries(fd.entries());
+  data.privacy = data.privacy ? 'Yes' : 'No';
+  data.release = data.release ? 'Yes' : 'No';
+  data.chipId = chipId();
+  data.submittedAt = new Date().toISOString();
+
+  let demo = !CONFIG.ENDPOINT;
+  if (!demo) {
+    try {
+      await fetch(CONFIG.ENDPOINT, { method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(data) });
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'TAPE OUT 🚀';
+      steps[cur].querySelector('.err').textContent = '> Fab offline: check your connection and try again.';
+      return;
+    }
+  } else {
+    await new Promise(r => setTimeout(r, 900));
+  }
+
+  $('#tName').textContent = data.name;
+  $('#tId').textContent = data.chipId;
+  $('#tNode').textContent = (data.level || '').split(' - ')[0];
+  const label = {'Hands-on Workshop + Talks (Onsite)':'FULL TAPE-OUT · ONSITE','Talks only (Onsite)':'FAB VISITOR · ONSITE','Talks only (Online)':'REMOTE PROBE · ONLINE'};
+  $('#tTrack').textContent = label[data.track] || data.track;
+  $('#nextInfo').textContent = data.track.includes('Online')
+    ? "Screenshot this. We'll email the online link to " + data.email + " before the event."
+    : 'Screenshot this. Your Chip ID is your ticket, so bring it on the day.';
+  $('#formSec').style.display = 'none';
+  $('#doneSec').style.display = 'block';
+  if (demo) $('#demoNote').innerHTML = '<div class="note">PREVIEW MODE: this sign-up was not saved. Add the Google Apps Script URL to config.js to collect registrations.</div>';
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  $('#copyBtn').onclick = async () => {
+    try { await navigator.clipboard.writeText(data.chipId); $('#copyBtn').textContent = 'Copied ✓'; }
+    catch { $('#copyBtn').textContent = data.chipId; }
+  };
+}
+</script>
+</body>
+</html>

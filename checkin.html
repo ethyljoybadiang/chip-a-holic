@@ -100,7 +100,6 @@
     <label>School / Organization<input id="wOrg"></label>
     <label>Package
       <select id="wTrack">
-        <option>Talks only (Onsite)</option>
         <option>Hands-on Workshop + Talks (Onsite)</option>
       </select></label>
     <label class="chk"><input type="checkbox" id="wConsent"> They agreed to the data privacy notice</label>
@@ -125,7 +124,7 @@ let PIN = '', BY = '';
 /* ---------- demo data (only used when ENDPOINT is empty) ---------- */
 const demoRows = [
   {chipId:'CAH-7KQ2M',name:'Juan Dela Cruz',org:'Sample University',track:'Hands-on Workshop + Talks (Onsite)',laptop:"No, I'll need one",checkedInAt:'',releaseSigned:'',checkedInBy:''},
-  {chipId:'CAH-X9P4R',name:'Maria Santos',org:'Sample Institute of Technology',track:'Talks only (Onsite)',laptop:'',checkedInAt:'',releaseSigned:'',checkedInBy:''},
+  {chipId:'CAH-X9P4R',name:'Maria Santos',org:'Sample Institute of Technology',track:'Hands-on Workshop + Talks (Onsite)',laptop:'Yes, bringing my own laptop',checkedInAt:'',releaseSigned:'',checkedInBy:''},
   {chipId:'CAH-3HD8T',name:'Jose Reyes',org:'Sample Company',track:'Talks only (Online)',laptop:'',checkedInAt:'',releaseSigned:'',checkedInBy:''},
   {chipId:'CAH-L2W6N',name:'Ana Mendoza',org:'Sample University',track:'Hands-on Workshop + Talks (Onsite)',laptop:'Yes, bringing my own laptop',checkedInAt:'',releaseSigned:'',checkedInBy:''}
 ];

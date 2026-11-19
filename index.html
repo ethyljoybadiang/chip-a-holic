@@ -198,7 +198,6 @@
         <p class="hint">How are you joining Chip-A-Holic?</p>
         <div class="nodes" id="tracks">
           <label class="node"><input type="radio" name="track" value="Hands-on Workshop + Talks (Onsite)"><b>FULL</b><span><strong>Full Tape-out</strong>: hands-on workshop + talks. <em class="mono" style="color:var(--gold);font-style:normal;font-size:12px">ONSITE ONLY, hardware kits are in the fab</em></span></label>
-          <label class="node"><input type="radio" name="track" value="Talks only (Onsite)"><b>FAB</b><span><strong>Fab Visitor</strong>: talks only, joining in person</span></label>
           <label class="node"><input type="radio" name="track" value="Talks only (Online)"><b>PROBE</b><span><strong>Remote Probe</strong>: talks only, joining online</span></label>
         </div>
         <h3 style="margin-top:26px">What's your current process node?</h3>
@@ -379,7 +378,7 @@ function validate(i){
     if (!el.value.trim()) { el.focus(); err.textContent = '> Lint error: missing a required field.'; return false; }
     if (el.type === 'email' && !/^\S+@\S+\.\S+$/.test(el.value)) { el.focus(); err.textContent = '> Syntax error: that email won\'t compile.'; return false; }
   }
-  if (i === 2 && !form.querySelector('input[name=track]:checked')) { err.textContent = '> Choose a package first: Full Tape-out, Fab Visitor or Remote Probe.'; return false; }
+  if (i === 2 && !form.querySelector('input[name=track]:checked')) { err.textContent = '> Choose a package first: Full Tape-out or Remote Probe.'; return false; }
   if (i === 2 && !form.querySelector('input[name=level]:checked')) { err.textContent = '> Pick a process node. Any node. We\'re not picky.'; return false; }
   if (i === 3 && !gatePassed) { err.textContent = '> Timing not closed yet.'; return false; }
   return true;
@@ -429,7 +428,7 @@ async function submit(){
   $('#tName').textContent = data.name;
   $('#tId').textContent = data.chipId;
   $('#tNode').textContent = (data.level || '').split(' - ')[0];
-  const label = {'Hands-on Workshop + Talks (Onsite)':'FULL TAPE-OUT · ONSITE','Talks only (Onsite)':'FAB VISITOR · ONSITE','Talks only (Online)':'REMOTE PROBE · ONLINE'};
+  const label = {'Hands-on Workshop + Talks (Onsite)':'FULL TAPE-OUT · ONSITE','Talks only (Online)':'REMOTE PROBE · ONLINE'};
   $('#tTrack').textContent = label[data.track] || data.track;
   $('#nextInfo').textContent = data.track.includes('Online')
     ? "Screenshot this. We'll email the online link to " + data.email + " before the event."

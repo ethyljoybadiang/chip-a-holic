@@ -70,7 +70,7 @@ function walkin_(d) {
     const id = 'WALK-' + Math.random().toString(36).slice(2, 7).toUpperCase();
     const row = HEADERS.map(() => '');
     Object.assign(row, {
-      [C.submittedAt]: new Date(), [C.chipId]: id, [C.track]: d.track || 'Talks only (Onsite)',
+      [C.submittedAt]: new Date(), [C.chipId]: id, [C.track]: d.track || 'Hands-on Workshop + Talks (Onsite)',
       [C.name]: d.name || '', [C.email]: d.email || '', [C.mobile]: d.mobile || '', [C.org]: d.org || '',
       [C.privacy]: 'Yes (on-site)', [C.release]: 'Yes',
       [C.checkedInAt]: new Date(), [C.releaseSigned]: d.release ? 'Yes' : 'No', [C.checkedInBy]: d.by || ''

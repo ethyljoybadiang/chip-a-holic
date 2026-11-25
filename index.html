@@ -110,6 +110,14 @@
   .promo img{display:block;width:100%;height:auto}
   .promo span{display:block;padding:12px 14px;font-size:14px;color:var(--muted)}
   .promo span b{color:var(--gold);font-family:var(--mono)}
+  .privacy{margin-top:40px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:0 18px;font-size:14px;color:var(--muted)}
+  .privacy summary{cursor:pointer;padding:14px 0;font-family:var(--mono);font-size:13px;letter-spacing:.06em;color:var(--trace);list-style:none}
+  .privacy summary::before{content:"▸ ";} .privacy[open] summary::before{content:"▾ ";}
+  .privacy .pbody{padding-bottom:16px}
+  .privacy h4{color:var(--ink);font-size:14px;margin:16px 0 4px}
+  .privacy p,.privacy ul{margin:0 0 8px} .privacy ul{padding-left:20px}
+  .privacy b{color:var(--ink);font-weight:500}
+  .privacy a,.plink{color:var(--trace)}
   footer{margin-top:40px;font-size:13px;color:var(--muted);text-align:center}
   footer b{color:var(--ink)}
   .spin{display:inline-block;animation:sp 1s linear infinite}
@@ -253,7 +261,7 @@
         <h3>Final checks before tape-out.</h3>
         <p class="hint">The fab won't run without these.</p>
         <label class="check"><input type="checkbox" name="privacy" required>
-          <span>I consent to the IEEE CS Philippines Chapter collecting and processing my information for this workshop, in line with the Data Privacy Act of 2012 (RA 10173). <small>We use it only for registration, certificates and event updates.</small></span></label>
+          <span>I have read the <a href="#privacy" class="plink">Data Privacy Notice</a> and consent to the IEEE Computer Society Philippine Chapter collecting and processing my personal information for this workshop, in line with the Data Privacy Act of 2012 (RA 10173).</span></label>
         <label class="check"><input type="checkbox" name="release" required>
           <span>I understand that I need to sign the <b>IEEE Release Form</b> before joining the workshop. <small>Photos and videos may be taken during the event.</small></span></label>
         <div class="err"></div>
@@ -298,10 +306,37 @@
     </a>
   </section>
 
+  <!-- ===== DATA PRIVACY NOTICE ===== -->
+  <details class="privacy" id="privacy">
+    <summary>Data Privacy Notice</summary>
+    <div class="pbody">
+      <p>The <b>IEEE Computer Society Philippine Chapter</b> ("we") respects your privacy and handles your personal information in line with the <b>Data Privacy Act of 2012 (Republic Act No. 10173)</b>, its Implementing Rules and Regulations, and the <a href="https://www.ieee.org/security-privacy" target="_blank" rel="noopener">IEEE Privacy Policy</a>.</p>
+      <h4>What we collect</h4>
+      <p>Your name, email address, mobile number, school or organization, role, course or job title, IEEE membership status, experience level, laptop needs, dietary needs (optional), and your attendance and release-form status on the event day.</p>
+      <h4>Why we collect it</h4>
+      <ul>
+        <li>To process your registration and confirm your slot</li>
+        <li>To check you in, prepare hardware kits, laptops and meals</li>
+        <li>To send event updates and, for online participants, the event link</li>
+        <li>To issue certificates of participation</li>
+        <li>To report attendance to the IEEE Computer Society, the workshop's sponsor</li>
+      </ul>
+      <h4>Who can see it</h4>
+      <p>Only the workshop organizers. We share attendance records and signed IEEE Release Forms with the <b>IEEE Computer Society</b> as required for grant reporting, and only the names needed for venue access with <b>TIP Quezon City</b>. We never sell your data or use it for unrelated marketing.</p>
+      <h4>How we store and keep it</h4>
+      <p>Your information is stored in a password-protected Google Sheet accessible only to authorized organizers. We keep it until the workshop's final report to the IEEE Computer Society is complete, and no longer than one (1) year after the event, after which it is deleted.</p>
+      <h4>Your rights</h4>
+      <p>You may ask to access, correct or delete your information, object to its processing, or withdraw your consent at any time. You may also file a complaint with the <a href="https://privacy.gov.ph" target="_blank" rel="noopener">National Privacy Commission</a>.</p>
+      <h4>Contact us</h4>
+      <p id="privacyContact">For any privacy concern or request, contact the IEEE Computer Society Philippine Chapter, the organizer of this workshop.</p>
+    </div>
+  </details>
+
   <footer>
     <b>Chip-A-Holic: An IEEE CS TCVLSI Workshop on VLSI and Emerging Technologies</b><br>
     Sponsored by the IEEE Computer Society Technical Community on VLSI.<br>
     Organized by the <b>IEEE Computer Society Philippine Chapter</b><br>Co-presented with the <b>Technological Institute of the Philippines – Quezon City</b><br>In partnership with the <b>IEEE TIP Student Branch</b><br>
+    <a href="#privacy" class="plink">Data Privacy Notice</a><br>
     <span id="contactTxt"></span>
   </footer>
 </div>
@@ -313,6 +348,15 @@ const CONFIG = window.CONFIG || { ENDPOINT:'', VENUE:'TIP Quezon City', SEATS:'L
 document.getElementById('venueTxt').textContent = CONFIG.VENUE;
 document.getElementById('seatsTxt').textContent = CONFIG.SEATS;
 document.getElementById('contactTxt').textContent = CONFIG.CONTACT;
+// Privacy notice: open it when any "Data Privacy Notice" link is clicked
+document.querySelectorAll('a.plink').forEach(a => a.addEventListener('click', e => {
+  e.preventDefault();
+  const d = document.getElementById('privacy');
+  d.open = true; d.scrollIntoView({behavior:'smooth', block:'start'});
+}));
+if (CONFIG.PRIVACY_CONTACT) document.getElementById('privacyContact').textContent =
+  'For any privacy concern or request, contact the IEEE Computer Society Philippine Chapter at ' + CONFIG.PRIVACY_CONTACT + '.';
+
 
 const $ = s => document.querySelector(s);
 const steps = [...document.querySelectorAll('.step')];

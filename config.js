@@ -4,5 +4,6 @@ window.CONFIG = {
   ENDPOINT: "https://script.google.com/macros/s/AKfycbxtpptYAIVitMP8QgjFNu1EPYvz04HgrDejtZnNXiTuzmNkpi1WwJHkLURm9IEkBEPmCA/exec",
   VENUE: "TIP Quezon City",
   SEATS: "Limited slots",
-  CONTACT: ""   // e.g. "Questions? Message IEEE CS Philippines on Facebook"
+  CONTACT: "",          // e.g. "Questions? Message IEEE CS Philippines on Facebook"
+  PRIVACY_CONTACT: ""   // email shown in the Data Privacy Notice
 };

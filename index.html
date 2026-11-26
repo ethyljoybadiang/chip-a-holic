@@ -118,6 +118,9 @@
   .privacy p,.privacy ul{margin:0 0 8px} .privacy ul{padding-left:20px}
   .privacy b{color:var(--ink);font-weight:500}
   .privacy a,.plink{color:var(--trace)}
+  .laptopbox{margin:18px 0;border:1px dashed var(--gold);border-radius:6px;padding:12px 14px}
+  .laptopbox p{margin:0 0 10px;font-size:14px;color:var(--muted)}
+  .laptopbox b{color:var(--gold)}
   footer{margin-top:40px;font-size:13px;color:var(--muted);text-align:center}
   footer b{color:var(--ink)}
   .spin{display:inline-block;animation:sp 1s linear infinite}
@@ -205,7 +208,7 @@
         <h3>Pick your package.</h3>
         <p class="hint">How are you joining Chip-A-Holic?</p>
         <div class="nodes" id="tracks">
-          <label class="node"><input type="radio" name="track" value="Hands-on Workshop + Talks (Onsite)"><b>FULL</b><span><strong>Full Tape-out</strong>: hands-on workshop + talks. <em class="mono" style="color:var(--gold);font-style:normal;font-size:12px">ONSITE ONLY, hardware kits are in the fab</em></span></label>
+          <label class="node"><input type="radio" name="track" value="Hands-on Workshop + Talks (Onsite)"><b>FULL</b><span><strong>Full Tape-out</strong>: hands-on workshop + talks. <em class="mono" style="color:var(--gold);font-style:normal;font-size:12px">ONSITE ONLY · BRING YOUR OWN LAPTOP</em></span></label>
           <label class="node"><input type="radio" name="track" value="Talks only (Online)"><b>PROBE</b><span><strong>Remote Probe</strong>: talks only, joining online</span></label>
         </div>
         <h3 style="margin-top:26px">What's your current process node?</h3>
@@ -216,12 +219,11 @@
           <label class="node"><input type="radio" name="level" value="7nm - I've written Verilog/VHDL"><b>7nm</b><span>I've written Verilog/VHDL and survived the testbench</span></label>
           <label class="node"><input type="radio" name="level" value="2nm - I dream in GDSII"><b>2nm</b><span>I dream in GDSII and argue about slack</span></label>
         </div>
-        <label class="f" style="margin-top:18px" id="laptopF"><span>Will you bring a laptop?</span>
-          <select name="laptop" required>
-            <option value="">— select —</option>
-            <option>Yes, bringing my own laptop</option>
-            <option>No, I'll need one</option>
-          </select></label>
+        <div id="laptopF" class="laptopbox">
+          <p><b>💻 Laptop required.</b> The hands-on workshop needs your own laptop, fully charged, with its charger. We won't be providing laptops.</p>
+          <label class="check" style="margin:0"><input type="checkbox" name="laptop" value="Yes, bringing my own laptop" required>
+            <span>I'll bring my own laptop.</span></label>
+        </div>
         <label class="f" id="dietF"><span>Dietary needs <em>// optional, for snacks</em></span>
           <input type="text" name="diet" placeholder="e.g. vegetarian, no pork"></label>
         <div class="err"></div>
@@ -312,11 +314,11 @@
     <div class="pbody">
       <p>The <b>IEEE Computer Society Philippine Chapter</b> ("we") respects your privacy and handles your personal information in line with the <b>Data Privacy Act of 2012 (Republic Act No. 10173)</b>, its Implementing Rules and Regulations, and the <a href="https://www.ieee.org/security-privacy" target="_blank" rel="noopener">IEEE Privacy Policy</a>.</p>
       <h4>What we collect</h4>
-      <p>Your name, email address, mobile number, school or organization, role, course or job title, IEEE membership status, experience level, laptop needs, dietary needs (optional), and your attendance and release-form status on the event day.</p>
+      <p>Your name, email address, mobile number, school or organization, role, course or job title, IEEE membership status, experience level, laptop confirmation, dietary needs (optional), and your attendance and release-form status on the event day.</p>
       <h4>Why we collect it</h4>
       <ul>
         <li>To process your registration and confirm your slot</li>
-        <li>To check you in, prepare hardware kits, laptops and meals</li>
+        <li>To check you in, prepare hardware kits and meals</li>
         <li>To send event updates and, for online participants, the event link</li>
         <li>To issue certificates of participation</li>
         <li>To report attendance to the IEEE Computer Society, the workshop's sponsor</li>
@@ -384,9 +386,9 @@ document.querySelectorAll('.node input').forEach(r => r.addEventListener('change
 function applyTrack(){
   const t = (form.querySelector('input[name=track]:checked') || {}).value || '';
   const handsOn = t.startsWith('Hands-on'), onsite = t.includes('Onsite');
-  const lf = $('#laptopF'), sel = lf.querySelector('select');
+  const lf = $('#laptopF'), cb = lf.querySelector('input');
   lf.style.display = handsOn ? '' : 'none';
-  sel.required = handsOn; if (!handsOn) sel.value = '';
+  cb.required = handsOn; if (!handsOn) cb.checked = false;
   $('#dietF').style.display = onsite ? '' : 'none';
   if (!onsite) $('#dietF').querySelector('input').value = '';
 }
@@ -418,6 +420,7 @@ function validate(i){
   const s = steps[i], err = s.querySelector('.err');
   err.textContent = '';
   for (const el of s.querySelectorAll('[required]')) {
+    if (el.name === 'laptop' && !el.checked) { err.textContent = '> Hands-on needs your own laptop. Please confirm you\'ll bring one.'; return false; }
     if (el.type === 'checkbox' && !el.checked) { err.textContent = '> DRC error: please tick every box to sign off.'; return false; }
     if (!el.value.trim()) { el.focus(); err.textContent = '> Lint error: missing a required field.'; return false; }
     if (el.type === 'email' && !/^\S+@\S+\.\S+$/.test(el.value)) { el.focus(); err.textContent = '> Syntax error: that email won\'t compile.'; return false; }
